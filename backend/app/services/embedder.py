@@ -1,8 +1,24 @@
-"""
-Embedding service using sentence-transformers.
-"""
+"""Embedding service using sentence-transformers."""
 
-from typing import List, Union
+from typing import Any, List, Union
+
+# Some transformers releases call torch.utils._pytree.register_pytree_node during
+# import, but older torch builds shipped in certain environments do not expose
+# this helper. We defensively provide a no-op registration to keep imports from
+# crashing while still allowing embeddings to work.
+try:  # pragma: no cover - compatibility shim
+    import torch.utils._pytree as _torch_pytree
+
+    if not hasattr(_torch_pytree, "register_pytree_node"):
+        def _noop_register_pytree_node(*args: Any, **kwargs: Any) -> None:
+            """No-op registration for older PyTorch versions."""
+            pass
+
+        _torch_pytree.register_pytree_node = _noop_register_pytree_node  # type: ignore[attr-defined, assignment]
+except (ImportError, AttributeError):
+    # PyTorch unavailable or missing _pytree - SentenceTransformer will handle it
+    pass
+
 from sentence_transformers import SentenceTransformer
 import numpy as np
 
@@ -81,4 +97,3 @@ def get_embedder() -> EmbeddingService:
     if _embedder_instance is None:
         _embedder_instance = EmbeddingService()
     return _embedder_instance
-
