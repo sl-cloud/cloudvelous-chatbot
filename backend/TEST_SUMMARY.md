@@ -143,6 +143,18 @@ Only abstract method definitions and unreachable edge cases remain uncovered:
 
 ## Test Infrastructure
 
+### Test Configuration
+The test suite uses a two-level `conftest.py` structure:
+
+1. **Root `conftest.py`** (`backend/conftest.py`)
+   - Sets up stub modules BEFORE any imports
+   - Ensures stubs are available for CI/CD environments
+   - Prevents import errors when optional dependencies are missing
+
+2. **Test `conftest.py`** (`backend/tests/conftest.py`)
+   - Test fixtures and utilities
+   - Inherits stub setup from root conftest.py
+
 ### Test Fixtures (`tests/conftest.py`)
 - **Memory database engine** - In-memory SQLite for fast tests
 - **API client** - FastAPI TestClient for integration tests
@@ -216,9 +228,17 @@ After running with coverage, open `htmlcov/index.html` in a browser for detailed
 - pytest-cov==4.1.0
 - FastAPI TestClient (via fastapi)
 
+## CI/CD Compatibility
+The test suite is designed to run in CI/CD environments (like GitHub Actions) without installing heavy dependencies:
+- **Root conftest.py** sets up stubs before any app code is imported
+- Stubs are registered in `sys.modules` to intercept imports
+- No need to install: pgvector, sentence-transformers, openai, google-generativeai
+- Tests run fast (<1s) and don't require GPU or large model downloads
+
 ## Notes
 - Tests use stub implementations for heavy dependencies (transformers, LLMs)
 - Integration tests use in-memory database for speed
 - All tests are designed to run without external dependencies
 - Tests verify both happy paths and error handling
+- Stub modules prevent import errors in environments missing optional dependencies
 

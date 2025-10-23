@@ -80,4 +80,3 @@ dmypy.json
 *.tmp
 tmp/
 temp/
-__init__.py
