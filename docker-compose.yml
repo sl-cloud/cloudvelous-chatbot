@@ -1,0 +1,76 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: cloudvelous-chatbot-db
+    environment:
+      POSTGRES_DB: cloudvelous_chatbot
+      POSTGRES_USER: chatbot_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chatbot_user -d cloudvelous_chatbot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - chatbot-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cloudvelous-chatbot-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://chatbot_user:${POSTGRES_PASSWORD}@postgres:5432/cloudvelous_chatbot
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
+      ADMIN_API_KEY: ${ADMIN_API_KEY}
+      EMBED_MODEL: ${EMBED_MODEL:-all-MiniLM-L6-v2}
+      LLM_PROVIDER: ${LLM_PROVIDER:-openai}
+      WORKFLOW_EMBEDDING_ENABLED: ${WORKFLOW_EMBEDDING_ENABLED:-true}
+      FEEDBACK_THRESHOLD_FOR_RETRAIN: ${FEEDBACK_THRESHOLD_FOR_RETRAIN:-50}
+      WORKFLOW_SIMILARITY_WEIGHT: ${WORKFLOW_SIMILARITY_WEIGHT:-0.3}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - backend_cache:/root/.cache
+    networks:
+      - chatbot-network
+    command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  postadmin:
+    image: dpage/pgadmin4:8.8
+    container_name: cloudvelous-chatbot-postadmin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    ports:
+      - "5050:80"
+    volumes:
+      - postadmin_data:/var/lib/pgadmin
+    networks:
+      - chatbot-network
+
+volumes:
+  postgres_data:
+  backend_cache:
+  postadmin_data:
+
+networks:
+  chatbot-network:
+    driver: bridge
