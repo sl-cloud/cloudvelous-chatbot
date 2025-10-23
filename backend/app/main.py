@@ -29,8 +29,8 @@ async def root():
     """Root endpoint."""
     return {
         "message": "Cloudvelous Chat Assistant API",
-        "version": "0.1.0",
-        "status": "Phase 0 Complete - Infrastructure Ready",
+        "version": "0.2.0",
+        "status": "Phase 2 Complete - Workflow Reasoning Capture Ready",
         "docs": "/docs",
     }
 
@@ -49,7 +49,8 @@ async def startup_event():
     """Application startup event."""
     print("🚀 Cloudvelous Chat Assistant starting...")
     print("✅ Phase 0: Environment & Infrastructure - Complete")
-    print("⏳ Phase 1: Core Infrastructure - Pending")
+    print("✅ Phase 1: Core Infrastructure - Complete")
+    print("✅ Phase 2: Workflow Reasoning Capture - Complete")
 
 
 @app.on_event("shutdown")
@@ -58,9 +59,14 @@ async def shutdown_event():
     print("👋 Cloudvelous Chat Assistant shutting down...")
 
 
-# TODO: Add routers in Phase 1
-# app.include_router(chat.router)
-# app.include_router(training.router)
+# Include routers
+from app.routers.chat import router as chat_router
+from app.routers.training import router as training_router
+
+app.include_router(chat_router)
+app.include_router(training_router)
+
+# TODO: Add remaining routers in future phases
 # app.include_router(questions.router)
 # app.include_router(workflows.router)
 # app.include_router(admin.router)
