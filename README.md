@@ -11,6 +11,31 @@ An intelligent chatbot backend powered by RAG (Retrieval-Augmented Generation) w
 - **Self-Improving**: Automatically adjusts retrieval weights based on feedback
 - **GitHub Integration**: Automated repository documentation ingestion
 
+## Project Status
+
+✅ **Phase 0: Environment & Infrastructure Setup - COMPLETE**
+- Docker Compose configuration with PostgreSQL + pgvector
+- Backend Dockerfile with Python virtual environment
+- Database initialization scripts
+- Complete documentation
+
+✅ **Phase 1: Core Infrastructure - COMPLETE**
+- Database models and Alembic migrations
+- Configuration management
+- Model relationships and indexes
+
+✅ **Phase 2: Workflow Reasoning Capture - COMPLETE**
+- Workflow tracing service capturing complete reasoning chains
+- `/api/ask` endpoint with integrated RAG pipeline
+- `/api/train` endpoint for feedback processing
+- Workflow embeddings for learning from successful patterns
+- Multi-LLM support (OpenAI, Gemini)
+
+📚 **Documentation:**
+- [API Guide](PHASE2_API_GUIDE.md) - API endpoints and examples
+
+🎯 **Next:** Phase 3 - Admin Training Interface API
+
 ## Architecture
 
 ```

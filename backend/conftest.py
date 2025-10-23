@@ -1,17 +1,10 @@
-"""Pytest configuration and shared fixtures."""
-
-from __future__ import annotations
+"""Root conftest.py to set up test environment before any imports."""
 
 import sys
 import types
-from typing import Any, Dict, Generator, List, Optional
+from typing import Any, List
 
-import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
-
-
+# Set up stub modules BEFORE any app imports
 def _ensure_stub_modules() -> None:
     """Register lightweight stubs for heavy optional dependencies."""
     if "sentence_transformers" not in sys.modules:
@@ -97,7 +90,7 @@ def _ensure_stub_modules() -> None:
                 self.completions = _DummyChatCompletions()
 
         class _DummyOpenAI:
-            def __init__(self, api_key: Optional[str] = None) -> None:
+            def __init__(self, api_key: str = None) -> None:
                 self.api_key = api_key
                 self.chat = _DummyChat()
 
@@ -135,110 +128,6 @@ def _ensure_stub_modules() -> None:
         sys.modules["google.generativeai.types"] = genai_types_module
 
 
+# Run stub setup immediately when conftest is imported
 _ensure_stub_modules()
-
-
-@pytest.fixture(scope="session")
-def memory_db_engine():
-    """Provide a shared in-memory SQLite engine for tests."""
-    engine = create_engine("sqlite:///:memory:")
-    yield engine
-    engine.dispose()
-
-
-@pytest.fixture
-def test_db(memory_db_engine) -> Generator[Session, None, None]:
-    """
-    Provide an isolated SQLAlchemy session bound to the in-memory engine.
-
-    Tests can choose to create/drop tables as needed.
-    """
-    TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=memory_db_engine)
-    db = TestingSessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-@pytest.fixture
-def api_client() -> Generator[TestClient, None, None]:
-    """Create a FastAPI TestClient for integration tests."""
-    from app.main import app
-
-    with TestClient(app) as client:
-        yield client
-
-
-@pytest.fixture
-def sample_embedding() -> List[float]:
-    """Provide a deterministic sample embedding vector."""
-    return [round((i + 1) * 0.1, 2) for i in range(8)]
-
-
-class StubDBSession:
-    """
-    Lightweight stub mimicking the subset of SQLAlchemy session API used in tests.
-    """
-
-    def __init__(self) -> None:
-        self.added: List[Any] = []
-        self.flushed: bool = False
-        self.committed: bool = False
-        self._queries: Dict[Any, List[Any]] = {}
-
-    def add(self, obj: Any) -> None:
-        if getattr(obj, "id", None) is None:
-            obj.id = len(self.added) + 1
-        self.added.append(obj)
-
-    def flush(self) -> None:
-        self.flushed = True
-
-    def commit(self) -> None:
-        self.committed = True
-
-    def refresh(self, obj: Any) -> None:  # pragma: no cover - no-op
-        return
-
-    def rollback(self) -> None:  # pragma: no cover - no-op
-        return
-
-    # Helpers for configuring query behaviour in tests
-    def add_query_result(self, model: Any, results: List[Any]) -> None:
-        self._queries[model] = results
-
-    def query(self, *models: Any) -> "StubQuery":
-        # Support both single model and multiple model queries
-        if len(models) == 1:
-            return StubQuery(self._queries.get(models[0], []))
-        else:
-            # For multiple models (e.g., joins), use tuple as key
-            return StubQuery(self._queries.get(models, []))
-
-
-class StubQuery:
-    """Simple iterable stub used for query chaining in tests."""
-
-    def __init__(self, results: List[Any]) -> None:
-        self._results = results
-        self._filters: List[Any] = []
-
-    def filter(self, *args: Any, **kwargs: Any) -> "StubQuery":
-        return self
-
-    def join(self, *args: Any, **kwargs: Any) -> "StubQuery":
-        return self
-
-    def first(self) -> Optional[Any]:
-        return self._results[0] if self._results else None
-
-    def all(self) -> List[Any]:
-        return self._results
-
-    def limit(self, *_args: Any, **_kwargs: Any) -> "StubQuery":
-        return self
-
-    def order_by(self, *_args: Any, **_kwargs: Any) -> "StubQuery":
-        return self
 
