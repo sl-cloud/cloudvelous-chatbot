@@ -57,8 +57,6 @@ An intelligent chatbot backend powered by RAG (Retrieval-Augmented Generation) w
 - Git
 - At least 4GB RAM available for Docker
 
-### Option 1: Docker Compose (Recommended)
-
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
@@ -118,79 +116,6 @@ An intelligent chatbot backend powered by RAG (Retrieval-Augmented Generation) w
 7. **Run initial data ingestion** (after implementation)
    ```bash
    docker compose exec backend python scripts/initial_ingestion.py
-   ```
-
-### Option 2: Local Development
-
-For development without Docker:
-
-1. **Set up Python virtual environment**
-   ```bash
-   cd backend
-   bash setup.sh
-   source venv/bin/activate
-   ```
-
-2. **Install and configure PostgreSQL with pgvector**
-   
-   **Ubuntu/Debian:**
-   ```bash
-   # Add PostgreSQL repository
-   sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-   wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-   
-   # Install PostgreSQL 16
-   sudo apt-get update
-   sudo apt-get install -y postgresql-16
-   
-   # Install pgvector
-   sudo apt-get install -y postgresql-16-pgvector
-   
-   # Start PostgreSQL
-   sudo systemctl start postgresql
-   ```
-   
-   **macOS:**
-   ```bash
-   brew install postgresql@16
-   brew install pgvector
-   brew services start postgresql@16
-   ```
-
-3. **Create database and enable pgvector**
-   ```bash
-   # Connect to PostgreSQL
-   sudo -u postgres psql
-   
-   # Run these SQL commands:
-   CREATE DATABASE cloudvelous_chatbot;
-   CREATE USER chatbot_user WITH PASSWORD 'your_password';
-   GRANT ALL PRIVILEGES ON DATABASE cloudvelous_chatbot TO chatbot_user;
-   \c cloudvelous_chatbot
-   CREATE EXTENSION vector;
-   \q
-   ```
-
-4. **Configure environment**
-   ```bash
-   cd ..
-   cp .env.example .env
-   ```
-   
-   Update `DATABASE_URL` in `.env`:
-   ```
-   DATABASE_URL=postgresql://chatbot_user:your_password@localhost:5432/cloudvelous_chatbot
-   ```
-
-5. **Run database migrations**
-   ```bash
-   cd backend
-   alembic upgrade head
-   ```
-
-6. **Start development server**
-   ```bash
-   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
    ```
 
 ## Project Structure
