@@ -32,7 +32,6 @@ An intelligent chatbot backend powered by RAG (Retrieval-Augmented Generation) w
 - Multi-LLM support (OpenAI, Gemini)
 
 📚 **Documentation:**
-- [Phase 2 Complete](.cursor/phases/PHASE2_COMPLETE.md) - Full implementation details
 - [API Guide](PHASE2_API_GUIDE.md) - API endpoints and examples
 
 🎯 **Next:** Phase 3 - Admin Training Interface API
