@@ -28,7 +28,10 @@ class EmbeddingService:
             List of floats representing the embedding vector
         """
         embedding = self.model.encode(text, convert_to_numpy=True)
-        return embedding.tolist()
+        # Handle both numpy arrays and lists (for testing)
+        if hasattr(embedding, 'tolist'):
+            return embedding.tolist()
+        return embedding
     
     def embed_batch(self, texts: List[str]) -> List[List[float]]:
         """
@@ -41,7 +44,10 @@ class EmbeddingService:
             List of embedding vectors
         """
         embeddings = self.model.encode(texts, convert_to_numpy=True)
-        return embeddings.tolist()
+        # Handle both numpy arrays and lists (for testing)
+        if hasattr(embeddings, 'tolist'):
+            return embeddings.tolist()
+        return embeddings
     
     def cosine_similarity(self, vec1: List[float], vec2: List[float]) -> float:
         """
