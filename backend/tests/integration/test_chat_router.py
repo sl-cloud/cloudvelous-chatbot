@@ -1,4 +1,12 @@
-"""Integration tests for the chat router endpoints."""
+"""
+Integration tests for chat router endpoints.
+
+Tests cover:
+- Complete RAG workflow execution
+- Training session persistence
+- Reasoning chain capture
+- API response structure
+"""
 
 from __future__ import annotations
 

@@ -1,4 +1,12 @@
-"""Tests for WorkflowTracer capturing reasoning chain details."""
+"""
+Unit tests for workflow tracing service.
+
+Tests cover:
+- Step recording and timing
+- Chunk tracking and metadata
+- Reasoning chain construction
+- Timing accumulation
+"""
 
 from __future__ import annotations
 

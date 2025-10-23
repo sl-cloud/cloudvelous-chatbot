@@ -1,4 +1,13 @@
-"""Pytest configuration and shared fixtures."""
+"""
+Pytest configuration and shared fixtures.
+
+This module provides test infrastructure including:
+- Stub modules for heavy dependencies (pgvector, sentence-transformers, etc.)
+- Database fixtures (in-memory SQLite)
+- API client fixtures (FastAPI TestClient)
+- Stub database session for unit tests
+- Sample data fixtures
+"""
 
 from __future__ import annotations
 
@@ -209,12 +218,20 @@ class StubDBSession:
         self._queries[model] = results
 
     def query(self, *models: Any) -> "StubQuery":
-        # Support both single model and multiple model queries
-        if len(models) == 1:
-            return StubQuery(self._queries.get(models[0], []))
-        else:
-            # For multiple models (e.g., joins), use tuple as key
-            return StubQuery(self._queries.get(models, []))
+        """
+        Query for one or more models.
+        
+        For single model: db.query(User)
+        For joins: db.add_query_result((User, Profile), results)
+        
+        Args:
+            models: One or more model classes to query
+            
+        Returns:
+            StubQuery instance with configured results
+        """
+        query_key = models[0] if len(models) == 1 else models
+        return StubQuery(self._queries.get(query_key, []))
 
 
 class StubQuery:

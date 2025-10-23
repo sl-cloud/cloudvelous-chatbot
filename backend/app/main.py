@@ -4,14 +4,39 @@ Cloudvelous Chat Assistant - FastAPI Application Entry Point
 This is a placeholder that will be fully implemented in Phase 1.
 """
 
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Create FastAPI application
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    """
+    Application lifespan manager for startup and shutdown events.
+    
+    This replaces the deprecated @app.on_event decorators with the
+    modern lifespan context manager pattern.
+    """
+    # Startup
+    print("🚀 Cloudvelous Chat Assistant starting...")
+    print("✅ Phase 0: Environment & Infrastructure - Complete")
+    print("✅ Phase 1: Core Infrastructure - Complete")
+    print("✅ Phase 2: Workflow Reasoning Capture - Complete")
+    
+    yield  # Application runs here
+    
+    # Shutdown
+    print("👋 Cloudvelous Chat Assistant shutting down...")
+
+
+# Create FastAPI application with lifespan manager
 app = FastAPI(
     title="Cloudvelous Chat Assistant",
     description="Intelligent chatbot powered by RAG with workflow learning",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 # Configure CORS
@@ -42,21 +67,6 @@ async def health_check():
         "status": "healthy",
         "version": "0.1.0",
     }
-
-
-@app.on_event("startup")
-async def startup_event():
-    """Application startup event."""
-    print("🚀 Cloudvelous Chat Assistant starting...")
-    print("✅ Phase 0: Environment & Infrastructure - Complete")
-    print("✅ Phase 1: Core Infrastructure - Complete")
-    print("✅ Phase 2: Workflow Reasoning Capture - Complete")
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Application shutdown event."""
-    print("👋 Cloudvelous Chat Assistant shutting down...")
 
 
 # Include routers

@@ -1,4 +1,12 @@
-"""Comprehensive integration tests for training feedback endpoints."""
+"""
+Comprehensive integration tests for training feedback scenarios.
+
+Tests cover:
+- Incorrect answer handling
+- User corrections
+- Mixed chunk usefulness feedback
+- Multiple chunks per session
+"""
 
 from __future__ import annotations
 

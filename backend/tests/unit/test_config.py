@@ -1,4 +1,13 @@
-"""Tests for application configuration settings."""
+"""
+Unit tests for application configuration settings.
+
+Tests cover:
+- Default configuration values
+- Environment variable overrides
+- Type validation and coercion
+"""
+
+from __future__ import annotations
 
 import os
 

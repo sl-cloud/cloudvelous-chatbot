@@ -1,4 +1,12 @@
-"""Tests for the retriever service weighting and boosting logic."""
+"""
+Unit tests for retrieval service.
+
+Tests cover:
+- Accuracy weight application
+- Workflow-based chunk boosting
+- Result ranking and ordering
+- Integration with embedder service
+"""
 
 from __future__ import annotations
 

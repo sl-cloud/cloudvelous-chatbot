@@ -1,4 +1,12 @@
-"""Integration tests for error handling in routers."""
+"""
+Integration tests for error handling across API routers.
+
+Tests cover:
+- Embedding service failures
+- Missing session handling
+- Database connection errors
+- Graceful error responses
+"""
 
 from __future__ import annotations
 

@@ -1,4 +1,12 @@
-"""Comprehensive integration tests for the complete chat workflow."""
+"""
+Comprehensive integration tests for complete chat workflows.
+
+Tests cover:
+- Workflow learning disabled/enabled scenarios
+- Multiple chunk retrieval handling
+- Similar workflow boosting
+- Timing information capture
+"""
 
 from __future__ import annotations
 

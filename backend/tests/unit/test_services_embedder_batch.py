@@ -1,4 +1,12 @@
-"""Tests for embedding service batch operations."""
+"""
+Unit tests for embedding service batch operations.
+
+Tests cover:
+- Batch text embedding generation
+- Single text batch operation
+- Empty list handling
+- Result consistency with single embedding
+"""
 
 from __future__ import annotations
 

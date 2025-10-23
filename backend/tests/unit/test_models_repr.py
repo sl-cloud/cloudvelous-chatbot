@@ -1,4 +1,14 @@
-"""Basic smoke tests for SQLAlchemy model representations."""
+"""
+Unit tests for SQLAlchemy model __repr__ methods.
+
+Tests cover:
+- TrainingSession representation
+- EmbeddingLink representation
+- KnowledgeChunk representation
+- WorkflowVector representation
+- TrainingFeedback representation
+- ApprovedQuestion representation
+"""
 
 from __future__ import annotations
 

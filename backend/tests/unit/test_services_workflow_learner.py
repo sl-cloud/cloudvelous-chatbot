@@ -1,4 +1,12 @@
-"""Tests for workflow learner utilities."""
+"""
+Unit tests for workflow learning service.
+
+Tests cover:
+- Reasoning summary generation
+- Workflow embedding creation
+- Similar workflow search
+- Chunk ID extraction and deduplication
+"""
 
 from __future__ import annotations
 

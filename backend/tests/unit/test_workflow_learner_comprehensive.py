@@ -1,4 +1,13 @@
-"""Comprehensive tests for WorkflowLearner functionality."""
+"""
+Comprehensive unit tests for workflow learner edge cases.
+
+Tests cover:
+- Empty chunk handling
+- Single repository workflows
+- Unsuccessful session handling
+- Empty workflow lists
+- Chunk filtering logic
+"""
 
 from __future__ import annotations
 

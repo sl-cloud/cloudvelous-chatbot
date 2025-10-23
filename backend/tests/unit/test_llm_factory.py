@@ -1,4 +1,12 @@
-"""Tests for the LLM provider factory and singleton behaviour."""
+"""
+Unit tests for LLM provider factory and singleton pattern.
+
+Tests cover:
+- Provider creation (OpenAI, Gemini)
+- Unknown provider rejection
+- Singleton pattern enforcement
+- Provider metadata access
+"""
 
 from __future__ import annotations
 

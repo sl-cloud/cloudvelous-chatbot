@@ -1,4 +1,12 @@
-"""Validation tests for Pydantic schemas."""
+"""
+Unit tests for Pydantic schema validation.
+
+Tests cover:
+- ChatRequest/ChatResponse validation
+- TrainingFeedbackRequest validation
+- ReasoningChain serialization
+- Field validation and constraints
+"""
 
 from __future__ import annotations
 
