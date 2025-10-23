@@ -1,4 +1,12 @@
-"""Integration tests for the training feedback router."""
+"""
+Integration tests for training feedback router endpoints.
+
+Tests cover:
+- Feedback submission and processing
+- Chunk weight updates
+- Workflow embedding creation
+- Session retrieval with details
+"""
 
 from __future__ import annotations
 

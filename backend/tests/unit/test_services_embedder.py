@@ -1,4 +1,12 @@
-"""Tests for the embedding service utilities."""
+"""
+Unit tests for embedding service.
+
+Tests cover:
+- Text embedding generation
+- Model dimension exposure
+- Cosine similarity calculation
+- Singleton pattern enforcement
+"""
 
 from __future__ import annotations
 

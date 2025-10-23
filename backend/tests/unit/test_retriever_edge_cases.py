@@ -1,4 +1,12 @@
-"""Tests for retriever service edge cases and singleton behavior."""
+"""
+Unit tests for retriever service edge cases.
+
+Tests cover:
+- Singleton pattern enforcement
+- Default parameter handling
+- RetrievalResult serialization
+- Empty result handling
+"""
 
 from __future__ import annotations
 

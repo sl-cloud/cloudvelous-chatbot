@@ -1,4 +1,13 @@
-"""Comprehensive tests for WorkflowTracer functionality."""
+"""
+Comprehensive unit tests for workflow tracer edge cases.
+
+Tests cover:
+- Multiple steps and chunks
+- Timing breakdown validation
+- Content truncation
+- Empty workflows
+- Missing section titles
+"""
 
 from __future__ import annotations
 

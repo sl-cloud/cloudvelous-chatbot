@@ -1,4 +1,12 @@
-"""Tests for LLM provider implementations."""
+"""
+Unit tests for LLM provider implementations.
+
+Tests cover:
+- OpenAI provider text generation
+- Gemini provider text generation
+- System prompt handling
+- Provider metadata exposure
+"""
 
 from __future__ import annotations
 

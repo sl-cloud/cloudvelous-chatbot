@@ -1,4 +1,12 @@
-"""Tests for the GeneratorService prompt construction and provider integration."""
+"""
+Unit tests for answer generation service.
+
+Tests cover:
+- Context building from retrieval results
+- Prompt construction
+- LLM provider integration
+- Provider metadata exposure
+"""
 
 from __future__ import annotations
 

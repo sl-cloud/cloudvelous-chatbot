@@ -1,0 +1,54 @@
+# Pre-commit hooks for code quality and consistency
+# Install: pip install pre-commit && pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  # Ruff - Fast Python linter and formatter
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.14
+    hooks:
+      # Linter
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+        exclude: ^(alembic/|scripts/manual_retrain.py|scripts/initial_ingestion.py)
+      # Formatter
+      - id: ruff-format
+        exclude: ^(alembic/|scripts/manual_retrain.py|scripts/initial_ingestion.py)
+
+  # Built-in hooks for common issues
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^(\.cursor/|htmlcov/)
+      - id: end-of-file-fixer
+        exclude: ^(\.cursor/|htmlcov/)
+      - id: check-yaml
+        args: [--safe]
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+      - id: check-json
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: debug-statements
+      - id: mixed-line-ending
+
+  # Local hooks for testing
+  - repo: local
+    hooks:
+      # Run pytest on changed test files
+      - id: pytest
+        name: pytest
+        entry: bash -c 'cd backend && pytest tests/ -v --tb=short -x'
+        language: system
+        pass_filenames: false
+        stages: [manual]  # Only run when explicitly called
+        
+      # Run pytest with coverage
+      - id: pytest-cov
+        name: pytest with coverage
+        entry: bash -c 'cd backend && pytest tests/ --cov=app --cov-report=term-missing --cov-fail-under=95'
+        language: system
+        pass_filenames: false
+        stages: [manual]  # Only run when explicitly called
+

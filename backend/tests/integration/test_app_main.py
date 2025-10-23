@@ -1,4 +1,11 @@
-"""Smoke tests for root FastAPI endpoints."""
+"""
+Integration tests for main FastAPI application endpoints.
+
+Tests cover:
+- Root endpoint metadata
+- Health check endpoint
+- Basic API functionality
+"""
 
 from __future__ import annotations
 

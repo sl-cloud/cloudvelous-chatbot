@@ -1,4 +1,10 @@
-"""Tests for database connection and session management."""
+"""
+Unit tests for database connection and session management.
+
+Tests cover:
+- Database session generator pattern
+- Session lifecycle management
+"""
 
 from __future__ import annotations
 
