@@ -176,5 +176,4 @@ class WorkflowTracer:
             Dictionary representation suitable for JSON column
         """
         chain = self.build_reasoning_chain()
-        return chain.model_dump()
-
+        return chain.model_dump(mode="json")

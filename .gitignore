@@ -80,3 +80,4 @@ dmypy.json
 *.tmp
 tmp/
 temp/
+AGENTS.md
