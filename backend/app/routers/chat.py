@@ -147,7 +147,7 @@ async def ask_question(
         training_session = TrainingSession(
             query=request.question,
             response=answer,
-            reasoning_chain=reasoning_chain.model_dump(),
+            reasoning_chain=reasoning_chain.model_dump(mode="json"),
             retrieved_chunks=retrieved_chunks_json,
             workflow_context=None,  # Can be extended with repo relationships
             llm_provider=generator.get_provider_name(),
@@ -199,4 +199,3 @@ async def ask_question(
             status_code=500,
             detail=f"Error processing question: {str(e)}"
         )
-
