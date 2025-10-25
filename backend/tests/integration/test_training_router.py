@@ -11,6 +11,7 @@ Tests cover:
 from __future__ import annotations
 
 from types import SimpleNamespace
+from datetime import timedelta
 
 import pytest
 
@@ -23,6 +24,7 @@ from app.models import (
     KnowledgeChunk,
 )
 from app.routers import training as training_router
+from app.middleware.auth import create_access_token
 from app.config import settings
 from tests.conftest import StubDBSession
 
@@ -36,7 +38,16 @@ class _StubWorkflowLearner:
         return SimpleNamespace(id=11)
 
 
-def test_submit_feedback_updates_session_and_chunks(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
+@pytest.fixture
+def admin_token():
+    """Create a valid admin JWT token for authentication."""
+    return create_access_token(
+        {"sub": "admin", "role": "admin"},
+        expires_delta=timedelta(hours=1)
+    )
+
+
+def test_submit_feedback_updates_session_and_chunks(api_client, admin_token, monkeypatch: pytest.MonkeyPatch) -> None:
     """POST /api/train should record feedback, update weights, and invoke workflow learner."""
     db = StubDBSession()
 
@@ -93,6 +104,7 @@ def test_submit_feedback_updates_session_and_chunks(api_client, monkeypatch: pyt
                 "feedback_type": "correct",
                 "chunk_feedback": [{"chunk_id": 5, "was_useful": True}],
             },
+            headers={"Authorization": f"Bearer {admin_token}"}
         )
     finally:
         app.dependency_overrides.clear()
