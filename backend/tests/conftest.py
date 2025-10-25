@@ -11,6 +11,7 @@ This module provides test infrastructure including:
 
 from __future__ import annotations
 
+import os
 import sys
 import types
 from typing import Any, Dict, Generator, List, Optional
@@ -19,6 +20,9 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
+
+# Disable rate limiting for all tests BEFORE any app imports
+os.environ["RATE_LIMITING_ENABLED"] = "false"
 
 
 def _ensure_stub_modules() -> None:
@@ -212,6 +216,10 @@ class StubDBSession:
 
     def rollback(self) -> None:  # pragma: no cover - no-op
         return
+    
+    def begin_nested(self) -> "StubNestedTransaction":
+        """Begin a nested transaction (savepoint)."""
+        return StubNestedTransaction()
 
     # Helpers for configuring query behaviour in tests
     def add_query_result(self, model: Any, results: List[Any]) -> None:
@@ -232,6 +240,22 @@ class StubDBSession:
         """
         query_key = models[0] if len(models) == 1 else models
         return StubQuery(self._queries.get(query_key, []))
+
+
+class StubNestedTransaction:
+    """Stub for nested transaction (savepoint) support."""
+    
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        return False
+    
+    def commit(self) -> None:  # pragma: no cover - no-op
+        pass
+    
+    def rollback(self) -> None:  # pragma: no cover - no-op
+        pass
 
 
 class StubQuery:
@@ -258,4 +282,38 @@ class StubQuery:
 
     def order_by(self, *_args: Any, **_kwargs: Any) -> "StubQuery":
         return self
+
+    def count(self) -> int:
+        return len(self._results)
+
+    def group_by(self, *_args: Any, **_kwargs: Any) -> "StubQuery":
+        return self
+
+    def having(self, *_args: Any, **_kwargs: Any) -> "StubQuery":
+        return self
+
+    def outerjoin(self, *_args: Any, **_kwargs: Any) -> "StubQuery":
+        return self
+
+    def offset(self, *_args: Any, **_kwargs: Any) -> "StubQuery":
+        return self
+
+    def scalar(self) -> Any:
+        """Return first element of first row or None."""
+        return self._results[0] if self._results else 0
+
+    def distinct(self, *_args: Any, **_kwargs: Any) -> "StubQuery":
+        return self
+
+    def one_or_none(self) -> Optional[Any]:
+        """Return exactly one result or None."""
+        return self._results[0] if self._results else None
+
+    def one(self) -> Any:
+        """Return exactly one result or raise."""
+        if not self._results:
+            raise Exception("No row found")
+        if len(self._results) > 1:
+            raise Exception("Multiple rows found")
+        return self._results[0]
 

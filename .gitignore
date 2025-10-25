@@ -33,7 +33,7 @@ env/
 
 # IDEs
 .vscode/
-.cursor
+.cursor/
 .idea/
 *.swp
 *.swo

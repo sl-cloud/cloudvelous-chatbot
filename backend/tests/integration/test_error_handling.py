@@ -11,12 +11,14 @@ Tests cover:
 from __future__ import annotations
 
 from types import SimpleNamespace
+from datetime import timedelta
 
 import pytest
 
 from app.main import app
 from app.models import get_db
 from app.routers import chat as chat_router
+from app.middleware.auth import create_access_token
 from tests.conftest import StubDBSession
 
 
@@ -64,12 +66,18 @@ def test_training_endpoint_handles_missing_session(api_client) -> None:
     """POST /api/train should return 404 for non-existent sessions."""
     db = StubDBSession()
     db.add_query_result(None, [])  # No training session found
-    
+
+    # Create admin token for authentication
+    admin_token = create_access_token(
+        {"sub": "admin", "role": "admin"},
+        expires_delta=timedelta(hours=1)
+    )
+
     def override_db():
         yield db
-    
+
     app.dependency_overrides[get_db] = override_db
-    
+
     try:
         response = api_client.post(
             "/api/train",
@@ -78,10 +86,11 @@ def test_training_endpoint_handles_missing_session(api_client) -> None:
                 "is_correct": True,
                 "feedback_type": "correct",
             },
+            headers={"Authorization": f"Bearer {admin_token}"}
         )
     finally:
         app.dependency_overrides.clear()
-    
+
     assert response.status_code == 404
     assert "Training session not found" in response.json()["detail"]
 
