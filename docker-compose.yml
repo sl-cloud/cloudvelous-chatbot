@@ -45,6 +45,7 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app
+      - ./scripts:/app/scripts
       - backend_cache:/root/.cache
     networks:
       - chatbot-network

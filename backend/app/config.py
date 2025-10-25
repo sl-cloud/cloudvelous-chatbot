@@ -64,7 +64,7 @@ class Settings(BaseSettings):
         return v
     
     # Embedding Model Configuration
-    EMBED_MODEL: str = "all-MiniLM-L6-v2"
+    EMBED_MODEL: str = "text-embedding-3-small"
     
     # LLM Provider Configuration
     LLM_PROVIDER: str = "openai"
