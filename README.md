@@ -204,20 +204,6 @@ cloudvelous-chatbot/
 │   ├── init-db.sql              # Database initialization SQL
 │   ├── initial_ingestion.py     # Data ingestion script (planned)
 │   └── manual_retrain.py        # Manual retraining trigger
-├── docs/
-│   ├── DEBUGGING.md             # Troubleshooting guide
-│   ├── implementation-plans/    # GitHub ingestion implementation
-│   │   ├── README.md            # Implementation overview
-│   │   ├── 01-github-client.md  # GitHub API client
-│   │   ├── 02-fetch-files.md    # File fetching
-│   │   ├── 03-text-chunking.md  # Text chunking
-│   │   ├── 04-embeddings.md     # Embedding generation
-│   │   ├── 05-database-storage.md  # Database storage
-│   │   ├── 06-orchestration.md  # Pipeline orchestration
-│   │   ├── 07-testing.md        # Comprehensive testing
-│   │   ├── 08-incremental-updates.md  # SHA-based updates
-│   │   └── 09-openai-embeddings.md   # OpenAI integration
-│   └── USER_MANUAL.md           # End-user documentation
 ├── docker-compose.yml           # Docker Compose configuration
 ├── .env.example                 # Environment variable template
 └── README.md                    # This file
