@@ -9,31 +9,44 @@ from app.models import get_db, TrainingSession, TrainingFeedback, EmbeddingLink,
 from app.schemas.training import TrainingFeedbackRequest, TrainingFeedbackResponse
 from app.services import get_workflow_learner
 from app.config import settings
+from app.middleware.auth import require_admin_or_api_key
+from app.utils.logging import get_logger
+from app.utils.rate_limiting import conditional_limiter
 
 
 router = APIRouter(prefix="/api", tags=["training"])
 
 
 @router.post("/train", response_model=TrainingFeedbackResponse)
+@conditional_limiter("20/minute")  # Reasonable limit for feedback submissions
 async def submit_feedback(
     request: TrainingFeedbackRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    auth: dict = Depends(require_admin_or_api_key)
 ):
     """
     Submit feedback on a training session.
-    
+
+    **Phase 3 Enhancement:** Now requires admin authentication.
+
     This endpoint:
     1. Records feedback on the training session
     2. Updates chunk accuracy weights based on usefulness
     3. Creates workflow embeddings for successful sessions
-    
+
+    Requires: Admin JWT token or API key
+
     Args:
         request: Feedback request
         db: Database session
-        
+        auth: Authentication info from middleware
+
     Returns:
         Feedback response with update summary
     """
+    log = get_logger(__name__)
+    log.info(f"Feedback submission for session {request.session_id}", session_id=request.session_id, auth_type=auth.get("auth_type"))
+
     try:
         # Get training session
         session = db.query(TrainingSession).filter(

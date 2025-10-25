@@ -11,6 +11,7 @@ Tests cover:
 from __future__ import annotations
 
 from types import SimpleNamespace
+from datetime import timedelta
 
 import pytest
 
@@ -23,6 +24,7 @@ from app.models import (
     KnowledgeChunk,
 )
 from app.routers import training as training_router
+from app.middleware.auth import create_access_token
 from app.config import settings
 from tests.conftest import StubDBSession
 
@@ -36,7 +38,16 @@ class _StubWorkflowLearner:
         return SimpleNamespace(id=20)
 
 
-def test_submit_feedback_with_incorrect_answer(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
+@pytest.fixture
+def admin_token():
+    """Create a valid admin JWT token for authentication."""
+    return create_access_token(
+        {"sub": "admin", "role": "admin"},
+        expires_delta=timedelta(hours=1)
+    )
+
+
+def test_submit_feedback_with_incorrect_answer(api_client, admin_token, monkeypatch: pytest.MonkeyPatch) -> None:
     """POST /api/train should handle incorrect answers without creating workflow embedding."""
     db = StubDBSession()
 
@@ -93,6 +104,7 @@ def test_submit_feedback_with_incorrect_answer(api_client, monkeypatch: pytest.M
                 "feedback_type": "incorrect",
                 "chunk_feedback": [{"chunk_id": 7, "was_useful": False}],
             },
+            headers={"Authorization": f"Bearer {admin_token}"}
         )
     finally:
         app.dependency_overrides.clear()
@@ -115,7 +127,7 @@ def test_submit_feedback_with_incorrect_answer(api_client, monkeypatch: pytest.M
     assert len(learner.calls) == 0
 
 
-def test_submit_feedback_without_chunk_feedback(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_submit_feedback_without_chunk_feedback(api_client, admin_token, monkeypatch: pytest.MonkeyPatch) -> None:
     """POST /api/train should work without chunk-level feedback."""
     db = StubDBSession()
 
@@ -152,6 +164,7 @@ def test_submit_feedback_without_chunk_feedback(api_client, monkeypatch: pytest.
                 "feedback_type": "correct",
                 # No chunk_feedback provided
             },
+            headers={"Authorization": f"Bearer {admin_token}"}
         )
     finally:
         app.dependency_overrides.clear()
@@ -168,7 +181,7 @@ def test_submit_feedback_without_chunk_feedback(api_client, monkeypatch: pytest.
     assert training_session.is_correct == 1
 
 
-def test_submit_feedback_with_user_correction(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_submit_feedback_with_user_correction(api_client, admin_token, monkeypatch: pytest.MonkeyPatch) -> None:
     """POST /api/train should accept user corrections."""
     db = StubDBSession()
 
@@ -206,6 +219,7 @@ def test_submit_feedback_with_user_correction(api_client, monkeypatch: pytest.Mo
                 "user_correction": "This is the correct answer that should have been provided.",
                 "notes": "The answer was incomplete and missing key information."
             },
+            headers={"Authorization": f"Bearer {admin_token}"}
         )
     finally:
         app.dependency_overrides.clear()
@@ -219,7 +233,7 @@ def test_submit_feedback_with_user_correction(api_client, monkeypatch: pytest.Mo
     assert feedback_objs[0].notes == "The answer was incomplete and missing key information."
 
 
-def test_submit_feedback_mixed_chunk_usefulness(api_client, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_submit_feedback_mixed_chunk_usefulness(api_client, admin_token, monkeypatch: pytest.MonkeyPatch) -> None:
     """POST /api/train should handle mixed useful/not useful chunks correctly."""
     db = StubDBSession()
 
@@ -247,7 +261,7 @@ def test_submit_feedback_mixed_chunk_usefulness(api_client, monkeypatch: pytest.
         accuracy_weight=1.0,
     )
     chunk1.id = 1
-    
+
     chunk2 = KnowledgeChunk(
         repo_name="repo-2",
         file_path="file-2.md",
@@ -265,7 +279,7 @@ def test_submit_feedback_mixed_chunk_usefulness(api_client, monkeypatch: pytest.
         rank_position=1,
         was_useful=None,
     )
-    
+
     link2 = EmbeddingLink(
         session_id=4,
         chunk_id=2,
@@ -300,6 +314,7 @@ def test_submit_feedback_mixed_chunk_usefulness(api_client, monkeypatch: pytest.
                     {"chunk_id": 2, "was_useful": False},  # Decrease weight
                 ],
             },
+            headers={"Authorization": f"Bearer {admin_token}"}
         )
     finally:
         app.dependency_overrides.clear()
